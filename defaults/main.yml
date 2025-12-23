@@ -1,7 +1,7 @@
 ---
 # AWS Infrastructure Settings
 target_region: "us-east-1"
-byol_ami_id: "ami-xxxxxxxxxxxxxxxxx" # Your verified RHEL BYOL AMI (i.e. RHEL AWS Golden Image)
+byol_ami_id: "ami-036f60fa967cf8ed6" # This is for RHEL10, use your verified RHEL BYOL AMI (i.e. RHEL AWS Golden Image)
 
 # Tag-Based Migration Filters
 # Only instances with this Key:Value pair will be processed
