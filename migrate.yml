@@ -1,0 +1,6 @@
+---
+- name: Execute RHEL License Conversion
+  hosts: all
+  become: true
+  roles:
+    - rhel_license_migration

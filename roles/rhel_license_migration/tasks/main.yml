@@ -6,7 +6,7 @@
   include_tasks: 02_infra_swap.yml
 
 - name: "Phase 3: Provisioning & Licensing"
-  include_tasks: 03_provision.yml
+  include_tasks: 03_provisioning.yml
 
 - name: "Phase 4: Post-migration Validation"
   include_tasks: 04_validation.yml

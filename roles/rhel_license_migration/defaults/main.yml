@@ -1,6 +1,6 @@
 ---
 # AWS Infrastructure Settings
-target_region: "us-east-1"
+target_region: "us-east-2"
 byol_ami_id: "ami-036f60fa967cf8ed6" # This is for RHEL10, use your verified RHEL BYOL AMI (i.e. RHEL AWS Golden Image)
 
 # Tag-Based Migration Filters
@@ -9,8 +9,8 @@ migration_filter_key: "MigrationGroup"
 migration_filter_value: "Alpha"
 
 # Red Hat RHSM Credentials (Use Ansible Vault in Production)
-rh_username: "rh_service_account"
-rh_password: "secure_password"
+rh_username: "username"
+rh_password: "password"
 rh_pool_id: "" # Optional specific pool ID
 
 # Operational Toggles

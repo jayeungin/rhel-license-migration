@@ -1,12 +1,10 @@
 plugin: amazon.aws.aws_ec2
 regions:
-  - us-east-1
+  - us-east-2
 filters:
   # Filter for RHEL License-Included instances
-  "product-code": "3895032a-7e04-4402-861f-13a89078602b"
-  instance-state-name: ["running", "stopped"]
+  # "product-code": "3895032a-7e04-4402-861f-13a89078602b" # these are major version specific
+  instance-state-name: ["running"]
 keyed_groups:
-  - key: tags.Name
-    prefix: instance_name
-  - key: placement.availability_zone
-    prefix: az
+  - prefix: tag
+    key: tags
