@@ -1,0 +1,24 @@
+---
+- name: Wait for SSH accessibility
+  wait_for_connection:
+    timeout: 300
+
+- name: Restore secondary volume fstab entries
+  blockinfile:
+    path: /etc/fstab
+    block: "{{ original_fstab.stdout }}"
+    marker: "# {mark} ANSIBLE MIGRATED STORAGE"
+
+- name: Mount Data Volumes
+  command: mount -a
+
+- name: Register with Red Hat Subscription Manager
+  community.general.redhat_subscription:
+    state: present
+    username: "{{ rh_username }}"
+    password: "{{ rh_password }}"
+    auto_attach: true
+
+- name: Gather package facts for health check
+  package_facts:
+    manager: auto

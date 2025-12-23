@@ -1,0 +1,36 @@
+---
+- name: Verify Migration Tag Membership
+  set_fact:
+    is_target: "{{ migration_filter_value == (ansible_tags[migration_filter_key] | default('none')) }}"
+
+- name: Halt if instance is not in the designated migration group
+  meta: end_host
+  when: not is_target | bool
+
+- name: Proceeding with Migration for {{ inventory_hostname }}
+  debug:
+    msg: "Instance matches {{ migration_filter_key }}:{{ migration_filter_value }}. Starting migration."
+
+- name: Capture original mount points and fstab
+  shell: "grep -v '^#' /etc/fstab | grep -v ' / ' | grep -v ' /boot'"
+  register: original_fstab
+
+- name: Gather EC2 Facts for migration
+  amazon.aws.ec2_instance_info:
+    region: "{{ target_region }}"
+    instance_ids: "{{ ansible_ec2_instance_id }}"
+  delegate_to: localhost
+  register: original_ec2_info
+
+- name: Create Safety Snapshots of ALL volumes
+  amazon.aws.ec2_snapshot:
+    region: "{{ target_region }}"
+    volume_id: "{{ item.ebs.volume_id }}"
+    description: "Migration Backup for {{ inventory_hostname }}"
+    tags:
+      MigrationStatus: "Pre-Conversion"
+      OriginalInstance: "{{ inventory_hostname }}"
+      OriginalDevice: "{{ item.device_name }}"
+  loop: "{{ original_ec2_info.instances[0].block_device_mappings }}"
+  delegate_to: localhost
+  register: migration_snapshots

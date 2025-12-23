@@ -1,0 +1,9 @@
+---
+- name: Cleanup Safety Snapshots
+  amazon.aws.ec2_snapshot:
+    region: "{{ target_region }}"
+    snapshot_id: "{{ item.snapshot_id }}"
+    state: absent
+  loop: "{{ migration_snapshots.results }}"
+  delegate_to: localhost
+  when: run_cleanup | bool

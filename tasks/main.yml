@@ -1,0 +1,16 @@
+---
+- name: "Phase 1: Pre-migration Backups"
+  include_tasks: 01_preflight.yml
+
+- name: "Phase 2: Infrastructure Swap"
+  include_tasks: 02_infra_swap.yml
+
+- name: "Phase 3: Provisioning & Licensing"
+  include_tasks: 03_provision.yml
+
+- name: "Phase 4: Post-migration Validation"
+  include_tasks: 04_validation.yml
+
+- name: "Phase 5: Optional Maintenance Cleanup"
+  include_tasks: 05_cleanup.yml
+  when: run_cleanup | bool

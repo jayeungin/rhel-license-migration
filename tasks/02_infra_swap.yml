@@ -1,0 +1,34 @@
+---
+- name: Terminate original LI instance (Releases Private IP)
+  amazon.aws.ec2_instance:
+    region: "{{ target_region }}"
+    instance_ids: ["{{ ansible_ec2_instance_id }}"]
+    state: absent
+    wait: true
+  delegate_to: localhost
+
+- name: Launch BYOL Instance with original Network Config
+  amazon.aws.ec2_instance:
+    region: "{{ target_region }}"
+    image_id: "{{ byol_ami_id }}"
+    instance_type: "{{ original_ec2_info.instances[0].instance_type }}"
+    subnet_id: "{{ original_ec2_info.instances[0].subnet_id }}"
+    private_ip_address: "{{ original_ec2_info.instances[0].private_ip_address }}"
+    security_groups: "{{ original_ec2_info.instances[0].security_groups | map(attribute='group_id') | list }}"
+    iam_instance_profile: "{{ original_ec2_info.instances[0].iam_instance_profile.arn | default(omit) }}"
+    key_name: "{{ original_ec2_info.instances[0].key_name }}"
+    tags: "{{ original_ec2_info.instances[0].tags | combine({'LicenseType': 'BYOL'}) }}"
+    wait: true
+  delegate_to: localhost
+  register: new_byol_instance
+
+- name: Create and Attach Data Volumes from Snapshots
+  amazon.aws.ec2_vol:
+    region: "{{ target_region }}"
+    instance: "{{ new_byol_instance.instances[0].instance_id }}"
+    snapshot: "{{ item.snapshot_id }}"
+    device_name: "{{ item.item.tags.OriginalDevice }}"
+  loop: "{{ migration_snapshots.results }}"
+  # Skip the root volume snapshot as the new AMI provides its own root
+  when: item.item.tags.OriginalDevice != original_ec2_info.instances[0].root_device_name
+  delegate_to: localhost
